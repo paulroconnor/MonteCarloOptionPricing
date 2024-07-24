@@ -4,6 +4,8 @@
 #include <cmath>
 #include <random>
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 Option::Option(
             float S,  // Asset Price
@@ -25,33 +27,39 @@ Option::Option(
 
 void Option::priceEuropeanOptions() {
 
+    // initial value for payoff sumation
     double callPayoff = 0.0;
     double putPayoff = 0.0;
 
     for (int i = 1; i <= getNumberOfSimulations(); i++) {
 
         std::vector<float>* pricePath = generateAssetPath();
-        float finalPrice = (*pricePath).back();
-        delete pricePath;
+        float finalPrice = (*pricePath).back();  // get last price - price at exercise date
+        delete pricePath;  // delete price path from memory
 
-        if (finalPrice > getStrikePrice()) {
+        if (finalPrice > getStrikePrice()) {  // max(S - K, 0)
             callPayoff += finalPrice - getStrikePrice();
-        } else if (finalPrice < getStrikePrice()) {
+        } else if (finalPrice < getStrikePrice()) {  // max(K - S, 0)
             putPayoff += getStrikePrice() - finalPrice;
         }
 
     }
 
+    // Set values as average payoff discounted to present value
     EuropeanCall = (callPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
     EuropeanPut = (putPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+
+    // Print Output
+    std::cout << std::fixed << std::setprecision(4);
+    std::cout << std::setw(30) << std::left << "European Call Option Price" << ": $" << getEuropeanCall() << std::endl;
+    std::cout << std::setw(30) << std::left << "European Put Option Price" << ": $" << getEuropeanPut() << std::endl;
 
 }
 
 
 // Generate Asset Price Path ---------------------------------------------
 
-std::vector<float>* Option::generateAssetPath()
-{
+std::vector<float>* Option::generateAssetPath() {
     float timeStep = 1 / TRADING_DAYS_PER_YEAR;
     float sqrtTimeStep = sqrt(timeStep);
     int timeToMaturity = static_cast<int>(std::round(getYearsToMaturity() * TRADING_DAYS_PER_YEAR));  // round float to int
@@ -73,6 +81,33 @@ std::vector<float>* Option::generateAssetPath()
     
     return pricePath;
 }
+
+// Output Functions ------------------------------------------------------
+
+void Option::printInputs() {
+
+    for (int i = 0; i < 50; ++i) {
+        std::cout << "=";
+    }
+    std::cout << std::endl;
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << std::setw(30) << std::left << "Asset Price" << ": $" << getAssetPrice() << std::endl
+              << std::setw(30) << std::left << "Strike Price" << ": $" << getStrikePrice() << std::endl 
+              << std::setw(30) << std::left << "Growth Rate" << ": "  << getGrowthRate() * 100 << "%" << std::endl
+              << std::setw(30) << std::left << "Volatility" << ": "  << getVolatility() * 100 << "%" << std::endl         
+              << std::setw(30) << std::left << "Years To Maturity" << ": "  << getYearsToMaturity() << std::endl;
+
+    std::cout << std::fixed << std::setprecision(0);
+    std::cout << std::setw(30) << std::left << "Number of Simulations" << ": "  << getNumberOfSimulations() << std::endl;
+
+
+    for (int i = 0; i < 50; ++i) {
+        std::cout << "=";
+    }
+    std::cout << std::endl;
+}
+
 
 // Getting Variables -----------------------------------------------------
 

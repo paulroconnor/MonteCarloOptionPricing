@@ -24,6 +24,8 @@ public:
 
     std::vector<float>* generateAssetPath();
 
+    void printInputs();
+
     float getAssetPrice();
     float getStrikePrice();
     float getGrowthRate();
