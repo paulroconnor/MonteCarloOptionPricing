@@ -1,7 +1,7 @@
-// Option.h
+// option.h
 
-#ifndef _Monte-Carlo-Option-Pricing_Option_
-#define _Monte-Carlo-Option-Pricing_Option_
+#ifndef _MONTECARLOOPTIONPRICING_OPTION_H
+#define _MONTECARLOOPTIONPRICING_OPTION_H
 
 #include <iostream>
 
