@@ -1,15 +1,16 @@
-// option.h
+// Option.h
 
 #ifndef _MONTECARLOOPTIONPRICING_OPTION_H
 #define _MONTECARLOOPTIONPRICING_OPTION_H
 
 #include <iostream>
+#include <vector>
 
 class Option
 {
 public:
 
-    const int TRADING_DAYS_PER_YEAR = 252;
+    const float TRADING_DAYS_PER_YEAR = 252;
 
     Option(
         float,  // Asset Price
@@ -17,7 +18,7 @@ public:
         float,  // Growth Rate
         float,  // Volatility
         float,  // Years To Maturity
-        long // Number of Simulations
+        long    // Number of Simulations
         );
     
     float getAssetPrice();
@@ -26,6 +27,8 @@ public:
     float getVolatility();
     float getYearsToMaturity();
     long getNumberOfSimulations();
+
+    std::vector<float>* generateAssetPath();
 
 private:
 
