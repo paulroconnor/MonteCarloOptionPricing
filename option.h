@@ -6,8 +6,7 @@
 #include <iostream>
 #include <vector>
 
-class Option
-{
+class Option {
 public:
 
     const float TRADING_DAYS_PER_YEAR = 252;
@@ -21,6 +20,10 @@ public:
         long    // Number of Simulations
         );
     
+    void priceEuropeanOptions();
+
+    std::vector<float>* generateAssetPath();
+
     float getAssetPrice();
     float getStrikePrice();
     float getGrowthRate();
@@ -28,7 +31,8 @@ public:
     float getYearsToMaturity();
     long getNumberOfSimulations();
 
-    std::vector<float>* generateAssetPath();
+    double getEuropeanCall();
+    double getEuropeanPut();
 
 private:
 
@@ -38,6 +42,9 @@ private:
     float Volatility;
     float YearsToMaturity;
     long NumberOfSimulations;
+
+    double EuropeanCall;
+    double EuropeanPut;
 
 };
 
