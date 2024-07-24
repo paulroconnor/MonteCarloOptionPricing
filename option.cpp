@@ -1,6 +1,6 @@
-// Option.cpp
+// option.cpp
 
-#include "option.h"
+#include "Option.h"
 #include <cmath>
 #include <random>
 
@@ -20,6 +20,7 @@ Option::Option(
     YearsToMaturity = Y;
     NumberOfSimulations = N;
 }
+
 
 
 // Getting Variables -----------------------------------------------------
