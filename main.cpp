@@ -10,7 +10,7 @@ int main(int argc, const char * argv[])
 
     std::cout << "Asset Price           : " << option.getAssetPrice() << std::endl
               << "Strike Price          : " << option.getStrikePrice() << std::endl 
-              << "Growth Rate           : " << option.generatePath() << std::endl
+              << "Growth Rate           : " << option.getGrowthRate() << std::endl
               << "Volatility            : " << option.getVolatility() << std::endl
               << "Years To Maturity     : " << option.getYearsToMaturity() << std::endl
               << "Number of Simulations : " << option.getNumberOfSimulations() << std::endl;
