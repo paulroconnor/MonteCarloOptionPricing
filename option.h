@@ -21,6 +21,7 @@ public:
         );
     
     void priceEuropeanOptions();
+    void priceAsianOptions();
 
     std::vector<float>* generateAssetPath();
 
@@ -36,6 +37,9 @@ public:
     double getEuropeanCall();
     double getEuropeanPut();
 
+    double getAsianCall();
+    double getAsianPut();
+
 private:
 
     float AssetPrice;
@@ -47,6 +51,9 @@ private:
 
     double EuropeanCall;
     double EuropeanPut;
+
+    double AsianCall;
+    double AsianPut;
 
 };
 

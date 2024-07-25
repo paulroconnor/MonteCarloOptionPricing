@@ -56,6 +56,39 @@ void Option::priceEuropeanOptions() {
 
 }
 
+// European Options ------------------------------------------------------
+
+void Option::priceAsianOptions() {
+
+    // initial value for payoff sumation
+    double callPayoff = 0.0;
+    double putPayoff = 0.0;
+
+    for (int i = 1; i <= getNumberOfSimulations(); i++) {
+
+        std::vector<float>* pricePath = generateAssetPath();
+        double meanPrice = std::accumulate((*pricePath).begin(), (*pricePath).end(), 0.0) / (*pricePath).size();  // get mean of prices in path
+        delete pricePath;  // delete price path from memory
+
+        if (meanPrice > getStrikePrice()) {  // max(avg(S) - K, 0)
+            callPayoff += meanPrice - getStrikePrice();
+        } else if (meanPrice < getStrikePrice()) {  // max(K - avg(S), 0)
+            putPayoff += getStrikePrice() - meanPrice;
+        }
+
+    }
+
+    // Set values as average payoff discounted to present value
+    AsianCall = (callPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+    AsianPut = (putPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+
+    // Print Output
+    std::cout << std::fixed << std::setprecision(4);
+    std::cout << std::setw(30) << std::left << "Asian Call Option Price" << ": $" << getAsianCall() << std::endl;
+    std::cout << std::setw(30) << std::left << "Asian Put Option Price" << ": $" << getAsianPut() << std::endl;
+
+}
+
 
 // Generate Asset Price Path ---------------------------------------------
 
@@ -141,4 +174,12 @@ double Option::getEuropeanCall() {
 
 double Option::getEuropeanPut() {
     return EuropeanPut;
+}
+
+double Option::getAsianCall() {
+    return AsianCall;
+}
+
+double Option::getAsianPut() {
+    return AsianPut;
 }
