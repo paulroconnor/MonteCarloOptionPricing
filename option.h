@@ -10,6 +10,7 @@ class Option {
 public:
 
     const float TRADING_DAYS_PER_YEAR = 252;
+    const int PRINT_WIDTH = 50;
 
     Option(
         float,  // Asset Price
@@ -22,6 +23,7 @@ public:
     
     void priceEuropeanOptions();
     void priceAsianOptions();
+    void priceLookbackOptions();
 
     std::vector<float>* generateAssetPath();
 
@@ -40,6 +42,11 @@ public:
     double getAsianCall();
     double getAsianPut();
 
+    double getLookbackCallFloat();
+    double getLookbackPutFloat();
+    double getLookbackCallFixed();
+    double getLookbackPutFixed();
+
 private:
 
     float AssetPrice;
@@ -54,6 +61,11 @@ private:
 
     double AsianCall;
     double AsianPut;
+
+    double LookbackCallFloat;
+    double LookbackPutFloat;
+    double LookbackCallFixed;
+    double LookbackPutFixed;
 
 };
 
