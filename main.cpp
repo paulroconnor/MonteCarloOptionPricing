@@ -1,6 +1,5 @@
 // Main.cpp
 
-#include <iostream>
 #include "Option.h"
 
 int main(int argc, const char * argv[]) {
@@ -14,6 +13,8 @@ int main(int argc, const char * argv[]) {
     option.priceAsianOptions();
 
     option.priceLookbackOptions();
+
+    option.priceBarrierOptions(150, 50);
 
     return 0;
 }

@@ -34,7 +34,7 @@ void Option::priceEuropeanOptions() {
 
     for (int i = 1; i <= getNumberOfSimulations(); i++) {
 
-        std::vector<float>* pricePath = generateAssetPath();
+        std::vector<double>* pricePath = generateAssetPath();
         double finalPrice = (*pricePath).back();  // get last price - price at exercise date
         delete pricePath;  // delete price path from memory
 
@@ -51,6 +51,7 @@ void Option::priceEuropeanOptions() {
     EuropeanPut = (putPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
 
     // Print Output
+    printSeparators();
     std::cout << std::fixed << std::setprecision(4);
     std::cout << std::setw(PRINT_WIDTH) << std::left << "European Call Option Price" << ": $" << getEuropeanCall() << std::endl;
     std::cout << std::setw(PRINT_WIDTH) << std::left << "European Put Option Price" << ": $" << getEuropeanPut() << std::endl;
@@ -67,7 +68,7 @@ void Option::priceAsianOptions() {
 
     for (int i = 1; i <= getNumberOfSimulations(); i++) {
 
-        std::vector<float>* pricePath = generateAssetPath();
+        std::vector<double>* pricePath = generateAssetPath();
         double meanPrice = std::accumulate((*pricePath).begin(), (*pricePath).end(), 0.0) / (*pricePath).size();  // get mean of prices in path
         delete pricePath;  // delete price path from memory
 
@@ -84,6 +85,7 @@ void Option::priceAsianOptions() {
     AsianPut = (putPayoff / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
 
     // Print Output
+    printSeparators();
     std::cout << std::fixed << std::setprecision(4);
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Asian Call Option Price" << ": $" << getAsianCall() << std::endl;
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Asian Put Option Price" << ": $" << getAsianPut() << std::endl;
@@ -103,7 +105,7 @@ void Option::priceLookbackOptions() {
 
     for (int i = 1; i <= getNumberOfSimulations(); i++) {
 
-        std::vector<float>* pricePath = generateAssetPath();
+        std::vector<double>* pricePath = generateAssetPath();
         double finalPrice = (*pricePath).back();  // get last price
         double maxPrice = *max_element((*pricePath).begin(), (*pricePath).end());  // get max of prices in path
         double minPrice = *min_element((*pricePath).begin(), (*pricePath).end());  // get min of prices in path
@@ -137,6 +139,7 @@ void Option::priceLookbackOptions() {
     LookbackPutFixed = (putPayoffFixed / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
 
     // Print Output
+    printSeparators();
     std::cout << std::fixed << std::setprecision(4);
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Lookback with Floating Strike Call Option Price" << ": $" << getLookbackCallFloat() << std::endl;
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Lookback with Floating Strike Put Option Price" << ": $" << getLookbackPutFloat() << std::endl;
@@ -146,10 +149,56 @@ void Option::priceLookbackOptions() {
 
 }
 
+// Barrier Options -------------------------------------------------------
+
+void Option::priceBarrierOptions(double CallBarrier, double PutBarrier) {
+
+    // initial value for payoff sumation
+    double callPayoffIn = 0.0;
+    double putPayoffIn = 0.0;
+
+    double callPayoffOut = 0.0;
+    double putPayoffOut = 0.0;
+
+    for (int i = 1; i <= getNumberOfSimulations(); i++) {
+
+        std::vector<double>* pricePath = generateAssetPath();
+        double finalPrice = (*pricePath).back();  // get last price - price at exercise date
+        double maxPrice = *max_element((*pricePath).begin(), (*pricePath).end());  // get max of prices in path
+        double minPrice = *min_element((*pricePath).begin(), (*pricePath).end());  // get min of prices in path
+        delete pricePath;  // delete price path from memory
+
+        if (maxPrice >= CallBarrier && finalPrice > getStrikePrice()) {  // If Barrier is hit (broken), 'In' call option becomes active with payoff max(ST - K, 0)
+            callPayoffIn += finalPrice - getStrikePrice();
+        } else if (maxPrice <= CallBarrier && finalPrice > getStrikePrice()) {  // If Barrier isn't hit (broken), 'Out' call option stays active with payoff max(ST - K, 0)
+            callPayoffOut += finalPrice - getStrikePrice();
+        } else if (minPrice <= PutBarrier && finalPrice < getStrikePrice()) { // If Barrier is hit (broken), 'In' put option becomes active with payoff max(K - ST, 0)
+            putPayoffIn += getStrikePrice() - finalPrice;
+        } else if (minPrice >= PutBarrier && finalPrice < getStrikePrice()) { // If Barrier isn't hit (broken), 'Out' put option stays active with payoff max(K - ST, 0)
+            putPayoffOut += getStrikePrice() - finalPrice;
+        }
+
+    }
+
+    // Set values as average payoff discounted to present value
+    InBarrierCall = (callPayoffIn / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+    InBarrierPut = (putPayoffIn / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+    OutBarrierCall = (callPayoffOut / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+    OutBarrierPut = (putPayoffOut / getNumberOfSimulations()) * exp(-getGrowthRate() * getYearsToMaturity());
+    
+    // Print Output
+    printSeparators();
+    std::cout << std::fixed << std::setprecision(4);
+    std::cout << std::setw(PRINT_WIDTH) << std::left << "European In-Barrier Call Option Price" << ": $" << getInBarrierCall() << std::endl;
+    std::cout << std::setw(PRINT_WIDTH) << std::left << "European In-Barrier Put Option Price" << ": $" << getInBarrierPut() << std::endl;
+    std::cout << std::setw(PRINT_WIDTH) << std::left << "European Out-Barrier Call Option Price" << ": $" << getOutBarrierCall() << std::endl;
+    std::cout << std::setw(PRINT_WIDTH) << std::left << "European Out-Barrier Put Option Price" << ": $" << getOutBarrierPut() << std::endl;
+
+}
 
 // Generate Asset Price Path ---------------------------------------------
 
-std::vector<float>* Option::generateAssetPath() {
+std::vector<double>* Option::generateAssetPath() {
     float timeStep = 1 / TRADING_DAYS_PER_YEAR;
     float sqrtTimeStep = sqrt(timeStep);
     int timeToMaturity = static_cast<int>(std::round(getYearsToMaturity() * TRADING_DAYS_PER_YEAR));  // round float to int
@@ -161,8 +210,8 @@ std::vector<float>* Option::generateAssetPath() {
     double z;
 
     // Create empty vector to store prices
-    std::vector<float>* pricePath = new std::vector<float>(timeToMaturity);
-    (*pricePath)[0] = static_cast<float>(getAssetPrice());
+    std::vector<double>* pricePath = new std::vector<double>(timeToMaturity);
+    (*pricePath)[0] = static_cast<double>(getAssetPrice());
 
     for (int t = 1; t <= timeToMaturity - 1; t++) {
         z = d(gen);
@@ -172,15 +221,13 @@ std::vector<float>* Option::generateAssetPath() {
     return pricePath;
 }
 
+
+
 // Output Functions ------------------------------------------------------
 
 void Option::printInputs() {
-
-    for (int i = 0; i < PRINT_WIDTH + 10; ++i) {
-        std::cout << "=";
-    }
-    std::cout << std::endl;
-
+  
+    printSeparators();
     std::cout << std::fixed << std::setprecision(2);
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Asset Price" << ": $" << getAssetPrice() << std::endl
               << std::setw(PRINT_WIDTH) << std::left << "Strike Price" << ": $" << getStrikePrice() << std::endl 
@@ -191,13 +238,16 @@ void Option::printInputs() {
     std::cout << std::fixed << std::setprecision(0);
     std::cout << std::setw(PRINT_WIDTH) << std::left << "Number of Simulations" << ": "  << getNumberOfSimulations() << std::endl;
 
+}
+
+void Option::printSeparators() {
 
     for (int i = 0; i < PRINT_WIDTH + 10; ++i) {
         std::cout << "=";
     }
     std::cout << std::endl;
-}
 
+}
 
 // Getting Variables -----------------------------------------------------
 
@@ -255,4 +305,20 @@ double Option::getLookbackCallFixed() {
 
 double Option::getLookbackPutFixed() {
     return LookbackPutFixed;
+}
+
+double Option::getInBarrierCall() {
+    return InBarrierCall;
+}
+
+double Option::getInBarrierPut() {
+    return InBarrierPut;
+}
+
+double Option::getOutBarrierCall() {
+    return OutBarrierCall;
+}
+
+double Option::getOutBarrierPut() {
+    return OutBarrierPut;
 }

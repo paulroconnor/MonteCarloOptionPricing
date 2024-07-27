@@ -3,7 +3,6 @@
 #ifndef _MONTECARLOOPTIONPRICING_OPTION_H
 #define _MONTECARLOOPTIONPRICING_OPTION_H
 
-#include <iostream>
 #include <vector>
 
 class Option {
@@ -24,10 +23,12 @@ public:
     void priceEuropeanOptions();
     void priceAsianOptions();
     void priceLookbackOptions();
+    void priceBarrierOptions(double, double);
 
-    std::vector<float>* generateAssetPath();
+    std::vector<double>* generateAssetPath();
 
     void printInputs();
+    void printSeparators();
 
     float getAssetPrice();
     float getStrikePrice();
@@ -46,6 +47,11 @@ public:
     double getLookbackPutFloat();
     double getLookbackCallFixed();
     double getLookbackPutFixed();
+
+    double getInBarrierCall();
+    double getInBarrierPut();
+    double getOutBarrierCall();
+    double getOutBarrierPut();
 
 private:
 
@@ -66,6 +72,11 @@ private:
     double LookbackPutFloat;
     double LookbackCallFixed;
     double LookbackPutFixed;
+
+    double InBarrierCall;
+    double InBarrierPut;
+    double OutBarrierCall;
+    double OutBarrierPut;
 
 };
 
