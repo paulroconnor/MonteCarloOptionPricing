@@ -222,7 +222,6 @@ std::vector<double>* Option::generateAssetPath() {
 }
 
 
-
 // Output Functions ------------------------------------------------------
 
 void Option::printInputs() {
