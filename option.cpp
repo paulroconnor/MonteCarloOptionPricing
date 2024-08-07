@@ -215,7 +215,7 @@ std::vector<double>* Option::generateAssetPath() {
 
     for (int t = 1; t <= timeToMaturity - 1; t++) {
         z = d(gen);
-        (*pricePath)[t] = (*pricePath)[t - 1] * exp(getGrowthRate() * timeStep + getVolatility() * sqrtTimeStep * z);
+        (*pricePath)[t] = (*pricePath)[t - 1] * exp((getGrowthRate() - 0.5 * getVolatility()) * timeStep + getVolatility() * sqrtTimeStep * z);
     };
     
     return pricePath;
